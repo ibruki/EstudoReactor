@@ -4,12 +4,16 @@ import br.com.util.Util;
 import reactor.core.publisher.Mono;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 public class Assignment01 {
 
     public static void main(String[] args) throws IOException {
 
-
+        String fileName = writeFile();
+        readFile(fileName);
+        deleteFile(fileName);
     }
 
 
@@ -21,16 +25,35 @@ public class Assignment01 {
             fileWriter.write(Util.faker().lorem().sentence(5).concat("\n"));
             fileWriter.write(Util.faker().lorem().sentence(5).concat("\n"));
             fileWriter.write(Util.faker().lorem().sentence(5).concat("\n"));
-            return "Arquivo criado com sucesso.";
+            return file.getName();
         } catch (IOException e) {
             return "Falha ao criar o arquivo.";
         }
     }
 
-    private static String deleteFile(String name){
+    private static Boolean deleteFile(String fileName) {
         try {
-            FileReader fileReader = new FileReader()
-        } catch (FileNotFoundException e) {
+            return Files.deleteIfExists(Paths.get("C:\\Users\\vito\\git\\EstudoReactor\\" + fileName));
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    private static void readFile(String fileName){
+        try{
+            FileReader fileReader = new FileReader(fileName);
+            BufferedReader bufferedReader = new BufferedReader(fileReader);
+            String linha = bufferedReader.readLine();
+            while(linha != null){
+                System.out.printf("%s\n", linha);
+
+                linha = bufferedReader.readLine();
+            }
+            fileReader.close();
+        } catch (FileNotFoundException e){
+            System.out.println(e.getMessage());
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
