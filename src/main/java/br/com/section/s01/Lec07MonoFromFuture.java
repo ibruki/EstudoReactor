@@ -5,7 +5,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.concurrent.CompletableFuture;
 
-public class Lec07MonoFromFeature {
+public class Lec07MonoFromFuture {
 
     public static void main(String[] args) {
 

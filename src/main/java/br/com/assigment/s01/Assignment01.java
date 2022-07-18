@@ -5,29 +5,39 @@ import reactor.core.publisher.Mono;
 
 import java.io.*;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class Assignment01 {
-
     public static void main(String[] args) throws IOException {
 
-        String fileName = writeFile();
+        Mono<String> fileName = createFile();
+            fileName.subscribe(
+                    () -> writeFile(),
+                    Util.onError());
+
         readFile(fileName);
         deleteFile(fileName);
     }
 
 
-    private static String writeFile(){
-        File file = new File(Util.faker().ancient().titan() + ".txt");
-        try (FileWriter fileWriter = new FileWriter(file.getName())) {
-            fileWriter.write(Util.faker().lorem().sentence(5).concat("\n"));
-            fileWriter.write(Util.faker().lorem().sentence(5).concat("\n"));
-            fileWriter.write(Util.faker().lorem().sentence(5).concat("\n"));
-            fileWriter.write(Util.faker().lorem().sentence(5).concat("\n"));
-            fileWriter.write(Util.faker().lorem().sentence(5).concat("\n"));
-            return file.getName();
+    private static Mono<String> createFile(){
+        return Mono.fromSupplier(
+                () -> {
+                    Util.sleepSeconds(3);
+                    return new File(Util.faker().ancient().titan() + ".txt").getName();
+                });
+    }
+
+    private static void writeFile(String fileName){
+        try {
+            Files.writeString(Paths.get(fileName), Util.faker().lorem().sentence(5).concat("\n"));
+            Files.writeString(Paths.get(fileName), Util.faker().lorem().sentence(5).concat("\n"));
+            Files.writeString(Paths.get(fileName), Util.faker().lorem().sentence(5).concat("\n"));
+            Files.writeString(Paths.get(fileName), Util.faker().lorem().sentence(5).concat("\n"));
+            Files.writeString(Paths.get(fileName), Util.faker().lorem().sentence(5).concat("\n"));
         } catch (IOException e) {
-            return "Falha ao criar o arquivo.";
+            e.printStackTrace();
         }
     }
 
@@ -40,21 +50,11 @@ public class Assignment01 {
         }
     }
 
-    private static void readFile(String fileName){
-        try{
-            FileReader fileReader = new FileReader(fileName);
-            BufferedReader bufferedReader = new BufferedReader(fileReader);
-            String linha = bufferedReader.readLine();
-            while(linha != null){
-                System.out.printf("%s\n", linha);
-
-                linha = bufferedReader.readLine();
-            }
-            fileReader.close();
-        } catch (FileNotFoundException e){
-            System.out.println(e.getMessage());
+    private static String readFile(String fileName){
+        try {
+            return Files.readString(Paths.get(fileName));
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 }
